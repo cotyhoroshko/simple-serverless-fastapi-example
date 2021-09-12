@@ -1,75 +1,28 @@
-  
 version: 2.1
 
-orbs:  
-  python: circleci/python@0.3.2
-  aws-cli: circleci/aws-cli@1.2.1
+orb:
+  python: circleci/python@1.0.0
 
-jobs:  
+jobs:
   build-and-test:
-    executor:
-      name: python/default
-      tag: '3.7'
+    executor: python/default
     steps:
       - checkout
       - run:
-          name: Setup Virtual env
+          name: Setup Virtual Env
           command: |
-            virtualenv -p python3.7 env
-            echo "source ./env/bin/activate" >> $BASH_ENV
+            virtualenv -p python3.8 venv
+            echo "source ./venv/bin/activate" >> $BASH_ENV
       - run:
-          name: Install Dependencies
+          name: Install Dependecies
           command: pip install -r requirements.txt
-      - run:
-          name: Create ENV file
-          command: env > .env
-      - run:
-          name: Test
-          command: pytest
-      - run:
-          name: Create Zipfile archive of Dependencies
-          command: |
-            cd env/lib/python3.7/site-packages
-            zip -r9 ../../../../function.zip .
-      - run:
-          name: Add App to Zipfile
-          command: zip -g ./function.zip .env -r app
-      - persist_to_workspace:
-          root: .
-          paths:
-            - function.zip
-  
-  deploy-dev: 
-    executor: aws-cli/default  
-    steps:    
-      - attach_workspace:
-          at: ./
-      - aws-cli/setup:
-          aws-region: AWS_DEFAULT_REGION
-          aws-access-key-id: AWS_ACCESS_KEY_ID
-          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
-      - run:
-          name: Upload to S3        
-          command: aws s3 cp function.zip s3://cicd-test-1/function.zip
-      - run:        
-          name: Deploy new Lambda        
-          command: aws lambda update-function-code --function-name cicd-test-1 --s3-bucket cicd-test-1 --s3-key function.zip
 
-    
-workflows:  
-  build-test-and-deploy:    
-    jobs:      
+workflows:
+  build-test-and-deploy:
+    jobs:
       - build-and-test:
-          context: serverless-fastapi-dev
-          filters:            
+          filters:
             branches:
               only:
-                - cicd-test-1
-      - deploy-dev:
-          context: serverless-fastapi-dev
-          requires:
-            - build-and-test    
-          filters:        
-            branches:
-              only:
-                - cicd-test-1
+                - cicd-devo-dev
+
