@@ -22,8 +22,4 @@ jobs:
 workflows:
   build-test-and-deploy:
     jobs:
-      - build-and-test:
-          filters:
-            branches:
-              only:
-                - cicd-devo-dev
+      - build-and-test
