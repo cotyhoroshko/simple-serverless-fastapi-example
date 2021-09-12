@@ -8,7 +8,7 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World!!!"}
+    return {"message": "Тобі вдалося, красень! Ти найшикарніша ічтота на світі!!!"}
 
 
 app.include_router(api_router, prefix="/api/v1")
