@@ -1,11 +1,13 @@
 version: 2.1
 
-orb:
+orbs:
   python: circleci/python@1.0.0
 
 jobs:
   build-and-test:
-    executor: python
+    executor:
+      name: python/default
+      tag: '3.8'
     steps:
       - checkout
       - run:
@@ -16,13 +18,11 @@ jobs:
       - run:
           name: Install Dependecies
           command: pip install -r requirements.txt
+      - run:
+          name: Test
+          command: pytest
 
 workflows:
   build-test-and-deploy:
     jobs:
-      - build-and-test:
-          filters:
-            branches:
-              only:
-                - cicd-devo-dev
-
+      - build-and-test
